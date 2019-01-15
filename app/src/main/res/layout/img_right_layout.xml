@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/icon_msg_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:maxWidth="30dp"
+        android:maxHeight="30dp"
+        android:minWidth="30dp"
+        android:minHeight="30dp"
+        android:contentDescription="icon of user"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icon_3" />
+
+    <ImageView
+        android:id="@+id/img_msg_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="10"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg"
+        android:contentDescription="image sended"
+        android:minWidth="100dp"
+        android:minHeight="100dp"
+        android:padding="4dp"
+        app:layout_constraintEnd_toStartOf="@+id/icon_msg_right"
+        app:layout_constraintTop_toBottomOf="@+id/text_msg_right"
+        app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+
+    <TextView
+        android:id="@+id/text_msg_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Вы"
+        android:textColor="@color/colorPrimary"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@+id/icon_msg_right"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/time_msg_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="*время*"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/img_msg_right"
+        app:layout_constraintEnd_toStartOf="@+id/img_msg_right" />
+</android.support.constraint.ConstraintLayout>

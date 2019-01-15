@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "62803822523",
+    "firebase_url": "https://chatv20-9bfdb.firebaseio.com",
+    "project_id": "chatv20-9bfdb",
+    "storage_bucket": "chatv20-9bfdb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:62803822523:android:4c82320a09a72789",
+        "android_client_info": {
+          "package_name": "com.example.chatv20"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "62803822523-pm8n6emd6d4vj61taufpg9h1hbjb0mvg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.chatv20",
+            "certificate_hash": "bb937fd9a8dcef6b4a87f64df5239b0613125c85"
+          }
+        },
+        {
+          "client_id": "62803822523-3eos129vgqftronthnj4ofqtb83mubio.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPEU8DtxXcVoxzw2jkSDqFLVnX1RwGcI8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "62803822523-3eos129vgqftronthnj4ofqtb83mubio.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
