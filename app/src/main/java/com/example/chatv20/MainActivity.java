@@ -841,13 +841,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //unregisterReceiver(mDLCompleteReceiver);
     }
 
-    void createAll(final boolean uploading) {
+    void createAll(final boolean uploading, final boolean sending) {
         Thread t = new Thread() {
             @Override
             public void run() {
                 int arg1;
                 if(uploading) {
                     arg1 = 1;
+                } else if(sending) {
+                    arg1 = -1;
                 } else {
                     arg1 = 0;
                 }
@@ -1098,7 +1100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         t.start();
 
-        Thread pong = new Thread() {
+       /* Thread pong = new Thread() {
             @Override
             public void run() {
                 while (true) {
@@ -1119,8 +1121,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             }
-        };
-        pong.start();
+        };*/
+        //pong.start();
 
 
         h = new Handler() {
@@ -1272,10 +1274,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if (object.has("end")) {
                                 if (object.get("end").equals("true")) {
                                     if(uploading) {
-                                        createAll(true);
+                                        createAll(true, false);
                                         uploading = false;
                                     } else {
-                                        createAll(false);
+                                        createAll(false, sending);
                                         sending = false;
                                     }
                                     new Thread() {
@@ -1300,14 +1302,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         if (!(alive || reconnecting ||
                                 //layout_notif||
-                                sending || msg.arg2 == 4)//&&MainActivity.this.toString().equals(original_activity)
+                                sending || msg.arg2 == 4 || msg.arg1 < 0)//&&MainActivity.this.toString().equals(original_activity)
                                 ) {
                             // TODO
                             showNotification(((String[]) msg.obj)[0], ((String[]) msg.obj)[1], msg.arg2);
                         } else {
                             log(1, "alive: " + alive +
                                     ", layout_notif: " + layout_notif +
-                                    ", sending: " + sending + ", icon: " + msg.arg2 +
+                                    ", arg1: " + msg.arg1 + ", icon: " + msg.arg2 +
                                     ", original activity: " + original_activity +
                                     ", this activity: " + MainActivity.this.toString()
                             );
