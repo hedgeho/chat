@@ -81,10 +81,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout layout;
     WebSocket socket_read, socket_write;
     BroadcastReceiver mDLCompleteReceiver;
-    String name;
     ProgressBar pb;
     int icon;
-    static String id;
+    static String id, token, name;
     int update_id;
     String url;
     boolean alive, layout_notif, sending, uploading;
@@ -321,6 +320,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         name = getIntent().getStringExtra("name");
         icon = getIntent().getIntExtra("icon", 1);
         id = getIntent().getStringExtra("uuid");
+        //id = "10";
+        token = getIntent().getStringExtra("token");
         layout = findViewById(R.id.layout);
         ll = findViewById(R.id.ll);
         ll.setOnScrollChangeListener(new View.OnScrollChangeListener() {
@@ -354,7 +355,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     int msg_count = 1;
                     while(c.moveToNext()) msg_count++;
                     c.close();
-                    socket_read.sendText("{\"lim\":30,\"msg\":\"false\",\"key\":\"" + id + "\",\"start\":" + (msg_count + upload_table_count*30-30) + "}");
+                    socket_read.sendText("{\"lim\":30,\"msg\":\"false\",\"key\":\"" + id + "\"," +
+                            "\"start\":" + (msg_count + upload_table_count*30-30) + ",\"token\":\"" + token + "\"}");
                     log(1, "uploading " + (msg_count + upload_table_count*30-30) + " - " + (msg_count + upload_table_count*30));
                     log(1, "upload sended");
                     ContentValues cv = new ContentValues();
@@ -405,13 +407,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     String date = format.format(new Date()) + "th" + format1.format(new Date());
                     JSONObject object = new JSONObject();
-                    object.put("system", "false")
-                            .put("uuid", id)
-                            .put("text", text)
+                    object.put("icon", "3")// + icon)
                             .put("name", name)
-                            .put("icon", "" + icon)
+                            .put("system", "false")
+                            .put("text", text)
                             .put("time", date)
-                            .put("type", "text");
+                            .put("type", "text")
+                            .put("token", token)
+                            .put("uuid", id);
                     socket_write.sendText(object.toString());
                     socket_write.disconnect();
 //                    socket.sendText("{\"system\":false,\"uuid\":\"170.51287793191963\",\"text\":\"test message 1\",\"name\":\"спамер\",\"icon\":\"3\",\n" +
@@ -481,11 +484,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 //            e("mylog", "last_date: " + last_view_date);
 //            e("mylog", "date: " + day);
+                log(3, "ch count: " + layout.getChildCount());
                 if (layout.getChildCount() == 1) last_upload_date = day;
 
                 if (uploading) {
                     if (last_upload_date.getDayOfYear() > day.getDayOfYear() || last_upload_date.getYear() > day.getYear()) {
-                        log(1, "creating divider");
+                        // TODO uploading divider
+                        log(3, "creating divider");
                         View divider = getLayoutInflater().inflate(R.layout.time_divider, layout, false);
                         ((TextView) divider.findViewById(R.id.tv_divider))
                                 .setText(last_upload_date.getDayOfMonth() + "." + String.format("%02d",
@@ -500,7 +505,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String div_text;
                         if (day.equals(current_date)) {
                             div_text = "Сегодня";
-                        } else if (day.getDayOfYear() == (current_date.getDayOfYear() == 1 ? 365 : day.getDayOfYear() - 1) ||
+                        } else if (day.getDayOfYear() == (current_date.getDayOfYear() == 1 ? 365 : current_date.getDayOfYear() - 1) ||
                                 (day.getDayOfYear() == 366 && current_date.getDayOfYear() == 1)) {
                             div_text = "Вчера";
                         } else {
@@ -731,11 +736,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             tv.setText(name);
             if (uploading) {
-//            if(layout.getChildCount() < upload_id+1) {
-////                upload_id = 0;
-////            }
-                //upload_id = layout.getChildCount();
-                // TODO
+//
                 layout.addView(view, upload_id++);//layout.getChildCount());
             } else {
                 layout.addView(view);
@@ -757,6 +758,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void showNotification(String nam, String message, int icon) {
 
+        Intent notif_intent = new Intent(this, MainActivity.class);
+        notif_intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent intent = PendingIntent.getActivity(this, 0, notif_intent, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1");
         switch (icon) {
             case 1:
@@ -771,15 +776,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 default:
                     builder.setSmallIcon(R.drawable.icon_2);
         }
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addNextIntent(new Intent(this, MainActivity.class)
-                .putExtra("name", name)
-                .putExtra("uuid", id)
-                .putExtra("icon", icon)
-                .putExtra("type", "notif"));
         builder.setContentTitle(nam)
                 .setContentText(message)
-                .setContentIntent(stackBuilder.getPendingIntent(0, PendingIntent.FLAG_NO_CREATE));
+                .setContentIntent(intent);
         Notification notification = builder.build();
 
 
@@ -1088,8 +1087,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     JSONObject object = new JSONObject();
                     object.put("key", id)
+                            .put("token", token)
                             .put("msg", "true")
                             .put("name", name);
+                    log(3, "key " + id + ", token " + token);
                     sending = true;
                     socket_read.sendText(object.toString());
                     //createAll();
@@ -1099,7 +1100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         t.start();
-
+//
        /* Thread pong = new Thread() {
             @Override
             public void run() {
@@ -1142,6 +1143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     JSONObject object = new JSONObject();
                                     //object.put("key", 170.51287793191963);
                                     object.put("key", id)
+                                            .put("token", token)
                                             .put("msg", "true")
                                             .put("name", name);
                                     sending = true;
@@ -1161,9 +1163,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             ContentValues cv = new ContentValues();
                             if (object.has("system") && object.has("uuid")
                                     && object.has("type")) {
+                                if(object.getString("type").equals("map")) {
+                                    // todo map
+                                    return;
+                                }
                                 if (!reconnecting||uploading) {
                                     final int arg1 = (uploading?1:0);
-                                    int msg_icon = Integer.parseInt(object.getString("icon"));
+                                    int msg_icon;
+                                    if(object.getString("icon").equals("None"))
+                                        msg_icon = 1;
+                                    else
+                                        msg_icon = Integer.parseInt(object.getString("icon"));
                                     if (object.getString("uuid").equals(MainActivity.id)) {
                                         msg_icon = 4;
                                     }
@@ -1294,7 +1304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         } catch (Exception e) {
                             log(2, e.toString());
-                            makeToast("Некорректный json");
+                            makeToast(e.toString());
                         }
                         break;
                     case TEXT_MSG:
@@ -1304,7 +1314,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 //layout_notif||
                                 sending || msg.arg2 == 4 || msg.arg1 < 0)//&&MainActivity.this.toString().equals(original_activity)
                                 ) {
-                            // TODO
                             showNotification(((String[]) msg.obj)[0], ((String[]) msg.obj)[1], msg.arg2);
                         } else {
                             log(1, "alive: " + alive +
@@ -1429,8 +1438,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onRestart() {
         log(2, "restart");
-        // TODO restart socket connection
-
+        h.sendEmptyMessage(RECONNECT);
         alive = true;
         super.onRestart();
     }
@@ -1464,7 +1472,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
     }
 
-    boolean tableExists(SQLiteDatabase db, String tableName) {
+    public static boolean tableExists(SQLiteDatabase db, String tableName) {
         if (tableName == null || db == null || !db.isOpen())
         {
             return false;
